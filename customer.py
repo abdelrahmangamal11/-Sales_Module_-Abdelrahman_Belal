@@ -1,25 +1,31 @@
 from base import BaseModel
 
+
 class Customer (BaseModel):
-    def __init__ (self,email,password):
+    def __init__ (self,name,email,phone):
+        super().__init__(name) 
         self._email=email
-        self._password=password
+        self._phone=phone
         pass
 
 
     @property
     def email(self):
-        return self.email
+        return self._email
 
     @email.setter
     def email(self, value):
         if not value:
             raise ValueError("Email cannot be empty")
-        self.email = value
+        self._email = value
 
+    @property
+    def phone(self):
+        return self._phone
 
-    @password.setter
-    def password(self, value):
-        if not value:
-            raise ValueError("Password is required")
-        self.password = value
+    @phone.setter
+    def phone(self, value):
+        self._phone = value
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(id={self.id}, name={self.name}, mail={self.email}, phone={self.phone})"
