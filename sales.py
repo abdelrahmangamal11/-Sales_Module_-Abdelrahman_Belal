@@ -1,23 +1,37 @@
 from base import BaseModel
+from invoice import Invoice
 
 class SaleOrder(BaseModel):
    
     
     def __init__(self,customer_id):
-        # super().__init__() 
+        super().__init__("sale_order")
         self._lines=[]
         self._state = "draft"
         self._customer_id=customer_id
 
-    def add_line(self,product, quantity,unite_price):
-        new_line = SaleOrderline(product, quantity,unite_price)
+    def add_line(self,product, quantity,unit_price):
+        new_line = SaleOrderline(product, quantity,unit_price)
         self._lines.append(new_line)
         return new_line
         
 
     def confirm(self):
         self._state="confirmed"
-        pass
+
+        # Create invoice for this order
+        invoice = Invoice(self._customer_id)
+
+        # Copy invoice lines from sale order
+        for line in self._lines:
+            invoice.add_line(
+                product=line.product,
+                quantity=line.quantity,
+                unit_price=line.unit_price
+            )
+        
+        return invoice
+        
 
     def cancel(self):
         self._state="canceled"
@@ -29,7 +43,7 @@ class SaleOrder(BaseModel):
         return self._state
     
     @property
-    def state(self):
+    def customer_id(self):
         return self._customer_id
     
     def __str__(self):
@@ -42,10 +56,10 @@ class SaleOrder(BaseModel):
 
 class SaleOrderline():
 
-    def __init__(self,product,quantity,unite_price):
+    def __init__(self,product,quantity,unit_price):
         self._quantity=quantity
-        self._unit_price=unite_price
-        self._sub_total=unite_price*quantity
+        self._unit_price=unit_price
+        self._sub_total=unit_price*quantity
         self._product=product
         pass
 
@@ -55,7 +69,7 @@ class SaleOrderline():
         return self._quantity
     
     @property
-    def unite_price(self):
+    def unit_price(self):
         return self._unit_price
     
     @property
@@ -68,7 +82,7 @@ class SaleOrderline():
         return self._sub_total
     
     def __str__(self):
-        return f"{self.__class__.__name__}(product={self.product}, quantity={self.quantity}, unite_price={self.unite_price}, total_price={self._sub_total})"
+        return f"{self.__class__.__name__}(product={self.product}, quantity={self.quantity}, unite_price={self.unit_price}, total_price={self._sub_total})"
 
 
 
